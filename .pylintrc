@@ -1,0 +1,9 @@
+[FORMAT]
+max-line-length=140
+
+[BASIC]
+good-names=__debug
+function-naming-style=snake_case
+
+[MESSAGES CONTROL]
+disable=missing-module-docstring,broad-except
