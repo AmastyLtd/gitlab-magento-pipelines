@@ -1,0 +1,79 @@
+---
+.magento:variables:mftf:
+  variables:
+    MAGENTO_DUMP_DIR: "$CI_PROJECT_DIR/magento-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+    DB_DUMP_DIR: "$CI_PROJECT_DIR/db-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+    MFTF_OUTPUT_DIR: "$CI_PROJECT_DIR/allure-results-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+    MAGE_ADMIN_PASSWORD: "Adm.in123"
+
+.magento:i18n:
+  script:
+    - toolbox.sh magento i18n
+
+.magento:deploy:installed:
+  script:
+    - toolbox.sh magento install  
+    - toolbox.sh modules add
+    - toolbox.sh magento deploy --production
+
+.magento:deploy:install:
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh magento install  
+    - toolbox.sh magento deploy --production
+
+.magento:deploy:upgrade:
+  script:
+    - toolbox.sh magento install  
+    - toolbox.sh modules add --branch master
+    - toolbox.sh magento deploy --production
+    - rm -rf "$MAGENTO_DIR/app/code" || true
+    - toolbox.sh modules add
+    - toolbox.sh magento deploy --force-cleanup
+
+.magento:deploy:dump:
+  extends: .magento:variables:mftf
+  cache:
+    - key: "magento-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+      paths:
+        - "$MAGENTO_DUMP_DIR"
+      policy: push
+    - key: "db-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+      paths:
+        - "$DB_DUMP_DIR"
+      policy: push
+  script:
+    - toolbox.sh modules add --with-smoke-module
+    - toolbox.sh magento install --create-admin
+    - toolbox.sh magento deploy --production
+    - toolbox.sh db dump --backup
+    - mv "$MAGENTO_DIR" "$MAGENTO_DUMP_DIR"
+
+.magento:mftf:
+  extends: .magento:variables:mftf
+  cache:
+    - key: "magento-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+      paths:
+        - "$MAGENTO_DUMP_DIR"
+      policy: pull-push
+      when: always
+    - key: "db-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
+      paths:
+        - "$DB_DUMP_DIR"
+      policy: pull-push
+      when: always
+  artifacts:
+      when: always
+      paths:
+        - "$CI_PROJECT_DIR/mftf.log"
+        - "$CI_PROJECT_DIR/.success_exit_code"
+        - "$MFTF_OUTPUT_DIR"
+      expire_in: 6h
+  script:
+    - toolbox.sh db dump --restore
+    - MAGENTO_DIR="$MAGENTO_DUMP_DIR" toolbox.sh magento mftf
+    - mv "$MAGENTO_DUMP_DIR/dev/tests/acceptance/tests/_output" "$MFTF_OUTPUT_DIR"
+  after_script:
+    - cp "$MAGENTO_DUMP_DIR/dev/tests/acceptance/mftf.log" "$CI_PROJECT_DIR/mftf.log" || true
+    - rm -rf "$MAGENTO_DUMP_DIR"
+    - rm -rf "$DB_DUMP_DIR"

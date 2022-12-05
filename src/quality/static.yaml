@@ -1,0 +1,13 @@
+---
+.static:phpstan:
+  artifacts:
+    reports:
+      junit: phpstan-report.xml
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh static phpstan
+
+.static:phpmd:
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh static phpmd

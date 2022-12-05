@@ -1,4 +1,4 @@
-# Continuous integration tools used at Amasty
+# Magento 2 CI CD pipeline tools used at Amasty
 
 Repository content:
 - [Documentation branch](../../tree/docs)
@@ -7,4 +7,4 @@ Repository content:
 - [toolbox.py branch](../../tree/toolbox.py)
 - [PHPCS image branch](../../tree/phpcs)
 - [Allure image branch](../../tree/allure)
-- [GitLab CI/CD config branch](../../tree/gitlab-ci)
+- **GitLab CI/CD config branch**

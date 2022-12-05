@@ -1,0 +1,31 @@
+---
+.services:variables:mysql:
+  variables:
+    MYSQL_ROOT_PASSWORD: my-secret-pw
+    MYSQL_DATABASE: magento
+    MYSQL_USER: magento
+    MYSQL_PASSWORD: magento
+
+.services:variables:elasticsearch:
+  variables:
+    ES_HOST: elasticsearch
+
+.services:mysql:
+  services:
+    - name: mysql:5.7
+
+.services:mariadb:
+  services:
+    - name: mariadb:10.4
+      alias: mysql
+
+.services:elasticsearch:
+  services:
+    - name: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+      alias: elasticsearch
+      command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
+
+.services:selenium:
+  services:
+    - name: selenium/standalone-chrome:latest
+      alias: selenium

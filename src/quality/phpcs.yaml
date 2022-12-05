@@ -1,0 +1,31 @@
+---
+.phpcs:base:
+  variables:
+    PHPCS_ALL_FILES: 0
+  artifacts:
+    expire_in: 1h
+    when: on_failure
+    paths:
+      - phpcbf.patch
+    reports:
+      junit: junit.xml
+
+.phpcs:amasty_ruleset:
+  extends: .phpcs:base
+  variables:
+    PHPCS_BASE_PATH: "${CI_PROJECT_DIR}"
+  script:
+    - phpcs.sh
+
+.phpcs:marketplace_ruleset:
+  extends: .phpcs:base
+  variables:
+    PHPCS_ALL_FILES: 1
+    PHPCS_IGNORE_ANNOTATIONS: 1
+    PHPCS_CODE_STANDARD: "Magento2"
+    PHPCS_SEVERITY: 10
+    PHPCS_FILE_EXTENSIONS: php,phtml
+    WORKSPACE: "/tmp/workspace"
+  script:
+    - clone-deps.sh "${WORKSPACE}"
+    - phpcs.sh "${WORKSPACE}" "${CI_PROJECT_DIR}"

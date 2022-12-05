@@ -1,0 +1,73 @@
+---
+.rule:master:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+
+.rule:magento-with-edition:
+  rules:
+    - if: &magento-with-edition >-
+        (
+          $CI_COMMIT_BRANCH == "master"
+          || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
+        ) && ($MAGENTO_EDITION == null || $MAGENTO_EDITION == $JOB_MAGE_EDITION)
+
+.rule:magento-with-edition-except-master:
+  rules:
+    - if: >-
+        $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
+        && ($MAGENTO_EDITION == null || $MAGENTO_EDITION == $JOB_MAGE_EDITION)
+
+.rule:magento-with-edition-except-smoke:
+  rules:
+    - exists:
+        - .smoke.json
+      when: never
+    - if: *magento-with-edition
+
+.rule:default-with-branch:
+  rules:
+    - if: &branch-rule >-
+        $CI_COMMIT_BRANCH == "master"
+        || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
+
+.rule:magento-smoke-with-edition:
+  rules:
+    - if: *magento-with-edition
+      exists:
+        - .smoke.json
+
+.rule:magento-smoke-with-edition-delayed:
+  rules:
+    - if: *magento-with-edition
+      exists:
+        - .smoke.json
+      when: delayed
+      start_in: 30 seconds
+
+.rule:merge-master:
+  rules:
+  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+
+.rule:unit-test:
+  rules:
+    - if: *branch-rule
+      exists:
+        - Test/Unit/**/*
+        - Test/Unit/*/*
+        - Test/Unit/*
+
+.rule:integration-tests:
+  rules:
+    - if: *branch-rule
+      exists:
+        - Test/Integration/**/*
+        - Test/Integration/*/*
+        - Test/Integration/*
+
+.rule:api-tests:
+  rules:
+    - if: *branch-rule
+      exists:
+        - Test/Api/**/*
+        - Test/Api/*/*
+        - Test/Api/*

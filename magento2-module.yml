@@ -1,0 +1,301 @@
+---
+workflow:
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"'
+      when: never
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+
+include:
+  - local: /src/magento.yaml
+  - local: /src/python/composer.yaml
+  - local: /src/python/tag.yaml
+  - local: /src/quality/phpcs.yaml
+  - local: /src/quality/static.yaml
+  - local: /src/test/phpunit.yaml
+  - local: /src/allure.yaml
+  - local: /src/images.yaml
+  - local: /src/rules.yaml
+  - local: /src/services.yaml
+
+stages:
+  - merge-master
+  - quality-check
+  - testing
+  - magento-deploy-test
+  - smoke-tests
+  - master-only
+
+.tags:
+  tags:
+    - docker
+    - ci-magento
+
+"Create tag":
+  stage: master-only
+  extends:
+    - .tags
+    - .rule:master
+    - .tag:create
+    - .image:toolbox.py
+
+### Run only in merge reuest if target is master branch.
+"composer.json":
+  stage: merge-master
+  extends:
+    - .tags
+    - .rule:merge-master
+    - .composer:validate
+    - .image:toolbox.py
+
+"i18n":
+  stage: merge-master
+  extends:
+    - .tags
+    - .rule:merge-master
+    - .magento:i18n
+    - .image:magento-v2-community
+  needs: ["composer.json"]
+### End.
+
+"PHPCS: Custom rulset":
+  stage: quality-check
+  extends:
+    - .tags
+    - .phpcs:amasty_ruleset
+    - .image:phpcs
+
+"PHPCS: Magento marketplace rulset":
+  stage: quality-check
+  extends:
+    - .tags
+    - .phpcs:marketplace_ruleset
+    - .image:phpcs
+    - .rule:default-with-branch
+### End
+
+"PHPStan":
+  stage: quality-check
+  allow_failure: true
+  extends:
+    - .tags
+    - .static:phpstan
+    - .image:magento-v2-community
+    - .rule:default-with-branch
+
+"PHPmd":
+  stage: quality-check
+  allow_failure: true
+  extends:
+    - .tags
+    - .static:phpmd
+    - .image:magento-v2-community
+    - .rule:default-with-branch
+
+"Unit Tests":
+  stage: testing
+  extends:
+    - .tags
+    - .phpunit:unit
+    - .image:magento-v2-community
+    - .rule:unit-test
+
+"Integration Tests":
+  stage: testing
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .phpunit:integration
+    - .image:magento-v2-community
+    - .rule:integration-tests
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+
+"Api Tests":
+  stage: testing
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .phpunit:api:rest
+    - .image:magento-v2-community
+    - .rule:api-tests
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+
+"Magento CE 2.3":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: community
+  services:
+    - !reference [.services:mysql, services]
+  extends:
+    - .tags
+    - .image:magento-v1-community
+    - .rule:magento-with-edition
+    - .services:variables:mysql
+    - .magento:deploy:installed
+
+"Magento EE 2.3":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: enterprise
+  services:
+    - !reference [.services:mysql, services]
+  extends:
+    - .tags
+    - .image:magento-v1-enterprise
+    - .rule:magento-with-edition
+    - .services:variables:mysql
+    - .magento:deploy:installed
+
+"Magento CE 2.4":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: community
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .image:magento-v2-community
+    - .rule:magento-with-edition-except-smoke
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:install
+
+"Magento EE 2.4":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: enterprise
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .image:magento-v2-enterprise
+    - .rule:magento-with-edition-except-smoke
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:install
+
+"Magento CE 2.4: upgrade from master branch":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: community
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .image:magento-v2-community
+    - .rule:magento-with-edition-except-master
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:upgrade
+
+"Magento CE 2.4 (dump)":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: community
+    SMOKE_MODULE_PATH: mftf/mftf-scripts/smoke-mftf.git
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  tags:
+    - runner3
+  extends:
+    - .image:magento-v2-community
+    - .rule:magento-smoke-with-edition
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:dump
+
+"Magento EE 2.4 (dump)":
+  stage: magento-deploy-test
+  variables:
+    JOB_MAGE_EDITION: enterprise
+    SMOKE_MODULE_PATH: mftf/mftf-scripts/smoke-mftf.git
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  tags:
+    - runner4
+  extends:
+    - .image:magento-v2-enterprise
+    - .rule:magento-smoke-with-edition
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:dump
+
+"Magento CE 2.4: Smoke":
+  stage: smoke-tests
+  variables:
+    JOB_MAGE_EDITION: community
+    AMASTY_SMOKE_MODULE_ENABLED: 1
+    MFTF_TEST_GROUP_NAME: "AmastySmokePages"
+  needs:
+    - "Magento CE 2.4 (dump)"
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+    - !reference [.services:selenium, services]
+  tags:
+    - runner3
+  extends:
+    - .image:web
+    - .rule:magento-smoke-with-edition-delayed
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:mftf
+
+"Magento EE 2.4: Smoke":
+  stage: smoke-tests
+  variables:
+    JOB_MAGE_EDITION: enterprise
+    AMASTY_SMOKE_MODULE_ENABLED: 1
+    MFTF_TEST_GROUP_NAME: "AmastySmokePages"
+  needs:
+    - "Magento EE 2.4 (dump)"
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+    - !reference [.services:selenium, services]
+  tags:
+    - runner4
+  extends:
+    - .image:web
+    - .rule:magento-smoke-with-edition-delayed
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:mftf
+
+"Generate allure report for CE 2.4":
+  stage: smoke-tests
+  variables:
+    JOB_MAGE_EDITION: community
+  needs:
+    - "Magento CE 2.4: Smoke"
+  extends:
+    - .tags
+    - .image:allure
+    - .magento:variables:mftf
+    - .rule:magento-smoke-with-edition
+    - .allure:report
+
+"Generate allure report for EE 2.4":
+  stage: smoke-tests
+  variables:
+    JOB_MAGE_EDITION: enterprise
+  needs:
+    - "Magento EE 2.4: Smoke"
+  extends:
+    - .tags
+    - .image:allure
+    - .magento:variables:mftf
+    - .rule:magento-smoke-with-edition
+    - .allure:report

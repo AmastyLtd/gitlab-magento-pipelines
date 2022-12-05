@@ -1,0 +1,12 @@
+---
+.allure:report:
+  artifacts:
+    when: always
+    paths:
+      - "$CI_PROJECT_DIR/allure-report"
+    expire_in: 2d
+  script:
+    - mkdir -p "$MAGENTO_DUMP_DIR/dev/tests/acceptance/tests"
+    - mv "$MFTF_OUTPUT_DIR" "$MAGENTO_DUMP_DIR/dev/tests/acceptance/tests/_output"
+    - allure generate "$MAGENTO_DUMP_DIR/dev/tests/acceptance/tests/_output/allure-results" --clean -o "$CI_PROJECT_DIR/allure-report/"
+    - cat "$CI_PROJECT_DIR/.success_exit_code" 2> /dev/null >&2 || custom-output fatal "Test run error.";

@@ -1,0 +1,4 @@
+---
+.composer:validate:
+  script:
+    - composer_json.py

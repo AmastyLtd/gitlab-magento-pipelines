@@ -1,0 +1,32 @@
+---
+.phpunit:unit:
+  artifacts:
+    reports:
+      junit: unit-report.xml
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh phpunit unit
+
+.phpunit:integration:
+  artifacts:
+    reports:
+      junit: integration-report.xml
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh phpunit integration
+
+.phpunit:api:rest:
+  artifacts:
+    reports:
+      junit: api-report.xml
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh phpunit api --type rest
+
+.phpunit:api:graphql:
+  artifacts:
+    reports:
+      junit: api-report.xml
+  script:
+    - toolbox.sh modules add
+    - toolbox.sh phpunit api --type graphql

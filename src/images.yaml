@@ -1,0 +1,24 @@
+---
+.image:phpcs:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/phpcs:latest
+
+.image:toolbox.py:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/python:latest
+
+.image:web:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/web:latest
+
+.image:allure:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/allure:latest
+
+.image:magento-v2-community:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v2-community:latest
+
+.image:magento-v2-enterprise:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v2-enterprise:latest
+
+.image:magento-v1-community:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v1-community:latest
+
+.image:magento-v1-enterprise:
+  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v1-enterprise:latest

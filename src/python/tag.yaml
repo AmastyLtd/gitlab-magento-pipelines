@@ -1,0 +1,5 @@
+---
+.tag:create:
+  script:
+    - git clone "https://${CONF_CUSERNAME}:${CONF_CTOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" /tmp/workspace
+    - create_tag.py /tmp/workspace
