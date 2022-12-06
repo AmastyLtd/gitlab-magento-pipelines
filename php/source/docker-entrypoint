@@ -1,0 +1,29 @@
+#!/bin/sh
+set -e
+
+git config --global user.email "$CONF_CUSERNAME@amasty.com"
+git config --global user.name "Gitlab CI"
+
+if [ -n "$MAGENTO_VERSION" ]; then
+  custom-output info ""
+  custom-output info "---    Magento $MAGENTO_VERSION ($MAGENTO_EDITION)     ---"
+  custom-output info ""
+fi
+
+if [ ! -d "$SCRIPTS_DIR" ]; then
+  custom-output info "Cloning scripts repository..."
+
+  if [ -n "$SCRIPTS_BRANCH" ]; then
+    git clone -b "$SCRIPTS_BRANCH" "https://$CONF_CUSERNAME:$CONF_CTOKEN@git.amasty.com/$CONF_SCR_FPATH.git" "$SCRIPTS_DIR"
+  else 
+    git clone "https://$CONF_CUSERNAME:$CONF_CTOKEN@git.amasty.com/$CONF_SCR_FPATH.git" "$SCRIPTS_DIR"
+  fi
+
+  chmod ug+x "$SCRIPTS_DIR" -R
+fi
+
+if [ -d "${SCRIPTS_DIR}/bin" ]; then
+  export PATH="${SCRIPTS_DIR}/bin:$PATH"
+fi
+
+exec "$@"

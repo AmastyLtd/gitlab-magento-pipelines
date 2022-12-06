@@ -1,0 +1,7 @@
+---
+php:publish:
+  extends: .publish
+  variables:
+    ORGINAL_IMAGE: "php:${PHP_TAG}"
+    TARGET_IMAGE: "web"
+  needs: ['php:build']
