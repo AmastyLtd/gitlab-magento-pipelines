@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.1/phpunit.xsd"
+         colors="true"
+         columns="max"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         bootstrap="./framework/bootstrap.php"
+         testSuiteLoaderClass="Magento\TestFramework\ApiSuiteLoader"
+         testSuiteLoaderFile="framework/Magento/TestFramework/ApiSuiteLoader.php"
+>
+    <testsuites>
+        <testsuite name="Magento GraphQL web API functional tests">
+             <file>testsuite/Magento/WebApiTest.php</file>
+        </testsuite>
+        <testsuite name="Magento GraphQL web API functional tests real suite">
+            <directory>testsuite/Magento/GraphQl</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <includePath>./testsuite</includePath>
+        <const name="TESTS_INSTALL_CONFIG_FILE" value="config/install-config-mysql.php"/>
+        <const name="TESTS_POST_INSTALL_SETUP_COMMAND_CONFIG_FILE" value="config/post-install-setup-command-config.php"/>
+        <const name="TESTS_GLOBAL_CONFIG_FILE" value="config/config-global.php"/>
+        <const name="TESTS_BASE_URL" value="http://localhost:8082"/>
+        <const name="TESTS_WEBSERVICE_USER" value="admin"/>
+        <const name="TESTS_WEBSERVICE_APIKEY" value="yQDVChqA92DLuXW6"/>
+        <const name="TESTS_XDEBUG_ENABLED" value="false"/>
+        <const name="TESTS_XDEBUG_SESSION" value="phpstorm" />
+
+        <ini name="date.timezone" value="America/Los_Angeles"/>
+
+        <const name="TESTS_GLOBAL_CONFIG_DIR" value="../../../app/etc"/>
+        <const name="TESTS_CLEANUP" value="enabled"/>
+        <const name="TESTS_MAGENTO_INSTALLATION" value="enabled"/>
+        <const name="TESTS_MAGENTO_MODE" value="default"/>
+        <const name="USE_OVERRIDE_CONFIG" value="enabled"/>
+    </php>
+
+    <!-- Test listeners -->
+    <listeners>
+        <listener class="Magento\TestFramework\Event\PhpUnit"/>
+    </listeners>
+</phpunit>
