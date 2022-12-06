@@ -1,0 +1,45 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: always
+    - when: never
+
+stages:
+  - build
+  - publish
+
+build:
+  tags:
+    - docker
+  stage: build
+  rules:
+    - when: always
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context $CI_PROJECT_DIR/
+      --dockerfile $CI_PROJECT_DIR/Dockerfile
+      --build-arg CI_AUTH="gitlab-ci-token:$CI_JOB_TOKEN"
+      --build-arg ALLURE_VERSION:${CI_COMMIT_TAG}
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+      --single-snapshot
+      --cleanup
+
+publish:
+  stage: publish
+  tags:
+    - docker
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: [""]
+  rules:
+    - when: manual
+  before_script:
+    - crane auth login -u ${CI_DEPLOY_USER} -p ${CI_DEPLOY_PASSWORD} ${CI_REGISTRY}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - crane cp "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" "${CI_REGISTRY}/git-tools/ci-common-repo/allure:latest"
