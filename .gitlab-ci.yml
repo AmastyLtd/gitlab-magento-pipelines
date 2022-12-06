@@ -1,0 +1,57 @@
+stages:
+  - lint
+  - build
+  - publish
+
+.common:
+  tags:
+    - docker
+
+shellcheck:
+  extends: .common
+  stage: lint
+  image: koalaman/shellcheck-alpine:stable
+  script:
+    - shellcheck bin/*.sh
+
+dockerfilelint:
+  extends: .common
+  stage: lint
+  image: hadolint/hadolint:latest-alpine
+  script:
+    - hadolint Dockerfile
+
+build:
+  extends: .common
+  stage: build
+  rules:
+    - if: $CI_COMMIT_TAG
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context $CI_PROJECT_DIR/
+      --dockerfile $CI_PROJECT_DIR/Dockerfile
+      --build-arg CLONE_URL="https://gitlab-ci-token:${CI_JOB_TOKEN}@git.amasty.com/tools/coding-standard.git"
+      --build-arg VERSION="${CI_COMMIT_TAG}"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+      --single-snapshot
+      --cleanup
+
+publish:
+  extends: .common
+  stage: publish
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: [""]
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual
+  before_script:
+    - crane auth login -u ${CI_DEPLOY_USER} -p ${CI_DEPLOY_PASSWORD} ${CI_REGISTRY}
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - crane cp "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" "${CI_REGISTRY}/git-tools/ci-common-repo/phpcs:latest"
