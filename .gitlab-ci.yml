@@ -1,0 +1,73 @@
+---
+include: /.gitlab/templates.yaml
+
+stages:
+  - lint
+  - build
+
+php:lint:template:
+  extends: .common
+  image: python:3.10
+  stage: lint
+  before_script:
+    - pip install Jinja2==3.0.3
+  script:
+    - python3 builder.py --mydumper --web 8.1 > "$CI_PROJECT_DIR/php/Dockerfile"
+  artifacts:
+    paths:
+      - php/Dockerfile
+    expire_in: 1 hour
+
+php:lint:
+  extends: .common
+  image: ghcr.io/hadolint/hadolint:latest-alpine
+  stage: lint
+  script:
+    - hadolint --failure-threshold error "$CI_PROJECT_DIR/php/Dockerfile"
+  needs: ["php:lint:template"]
+
+magento:2.3.7-p4:
+  stage: build
+  variables:
+    PHP_VERSION: "7.4"
+    PHP_TAG: "7.4"
+    MAGENTO_VERSION: "2.3.7-p4"
+    TARGET_PREFIX: "magento-v1-"
+  rules: &build_rules
+    - if: $CI_COMMIT_TAG
+      when: always
+    - when: never
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab/php.yaml
+      - local: .gitlab/magento.yaml
+
+magento:2.4.5-p1:
+  stage: build
+  variables:
+    PHP_VERSION: "8.1"
+    PHP_TAG: "8.1"
+    MAGENTO_VERSION: "2.4.5-p1"
+    TARGET_PREFIX: "magento-v2-"
+    IMAGE_OPTIONS: --mydumper
+  rules: *build_rules
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab/php.yaml
+      - local: .gitlab/magento.yaml
+
+php:8.1-web:
+  stage: build
+  variables:
+    PHP_VERSION: "8.1"
+    PHP_TAG: "8.1-web"
+    IMAGE_OPTIONS: --mydumper --web
+  rules: *build_rules
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab/php.yaml
+      - local: .gitlab/php-publish.yaml
+...

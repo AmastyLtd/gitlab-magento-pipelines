@@ -2,7 +2,7 @@
 
 Repository content:
 - [Documentation branch](../../tree/docs)
-- [Magento 2 images branch](../../tree/images)
+- **Magento 2 images branch**
 - [toolbox.sh branch](../../tree/toolbox.sh)
 - [toolbox.py branch](../../tree/toolbox.py)
 - [PHPCS image branch](../../tree/phpcs)

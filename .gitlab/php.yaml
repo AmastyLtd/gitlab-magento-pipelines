@@ -1,0 +1,25 @@
+---
+include: /.gitlab/templates.yaml
+
+php:template:
+  extends: .common
+  image: python:3.9
+  before_script:
+    - pip install Jinja2==3.0.3
+  script:
+    - python3 builder.py "${PHP_VERSION}" ${IMAGE_OPTIONS[@]} > "$CI_PROJECT_DIR/php/Dockerfile"
+  artifacts:
+    paths:
+      - php/Dockerfile
+    expire_in: 1 hour
+
+php:build:
+  extends: .common-build
+  needs: ["php:template"]
+  script:
+    - /kaniko/executor
+        --context "$CI_PROJECT_DIR/php"
+        --dockerfile "$CI_PROJECT_DIR/php/Dockerfile"
+        --destination "$CI_REGISTRY_IMAGE/php:${PHP_TAG}"
+        --single-snapshot
+        --cleanup

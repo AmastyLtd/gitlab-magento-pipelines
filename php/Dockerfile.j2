@@ -1,0 +1,63 @@
+{% if include_mydumper %}
+FROM alpine:3.16 AS mydumper
+
+RUN apk add --no-cache git build-base \
+    cmake glib-dev zlib-dev pcre-dev mariadb-dev
+RUN git clone https://github.com/mydumper/mydumper.git /source && \
+    cd /source && cmake . -DWITH_SSL=OFF && make
+
+{% endif %}
+FROM {{base_image}}
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_MEMORY_LIMIT=-1
+ENV HOME /home/{{user}}
+ENV SCRIPTS_DIR "$HOME/scripts"
+
+LABEL maintainer="DevOps Team <devops@amasty.com>" \
+      author="Eduard Muradov <eduard.muradov@amasty.com>" \
+      gitlab.pipline.info.composer_branch={{composer_version_branch}} \
+      gitlab.pipline.info.php_version={{php_version}} \
+      gitlab.pipline.info.include_mydumper={{include_mydumper|string|lower}} \
+      gitlab.pipline.info.web={{web|string|lower}}{% if image_version %} \
+      gitlab.pipline.info.version={{image_version}}{% endif %}
+
+# Install required dependencies
+RUN apk add --no-cache \
+    bash sudo git nano python3 zip procps \
+    freetype-dev libjpeg-turbo-dev libpng \
+    libxml2-dev libxslt-dev libsodium-dev libzip-dev \
+    icu-dev oniguruma-dev glib-dev mariadb-dev
+
+# Install PHP extensions from pecl
+RUN apk add --no-cache --virtual .build-deps g++ gcc make autoconf \
+    && pecl install pcov && docker-php-ext-enable pcov \
+    && apk del .build-deps
+
+# Configure the gd library
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j4 \
+        dom gd intl mbstring pdo_mysql xsl \
+        zip soap bcmath sockets opcache
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --{{composer_version_branch}} --filename=composer
+RUN addgroup {{user}} && adduser {{user}} -G {{user}} -h $HOME -D &&  chown {{user}}:{{user}} $HOME -R && chmod 744 $HOME -R
+RUN echo '%{{user}} ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/{{user}}
+RUN echo "memory_limit = {{php_memory_limit}}" >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
+
+{% if web %}
+RUN apk add --no-cache nginx && \
+    rm -rf /etc/nginx/http.d/default.conf && \
+    sed -i 's/user nginx;/user {{user}};/g' /etc/nginx/nginx.conf
+
+{% endif %}
+USER {{user}}
+WORKDIR $HOME
+
+{% if include_mydumper %}
+COPY --from=mydumper /source/mydumper /usr/local/bin/
+COPY --from=mydumper /source/myloader /usr/local/bin/
+
+{% endif %}
+COPY ./source/ /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint"]
