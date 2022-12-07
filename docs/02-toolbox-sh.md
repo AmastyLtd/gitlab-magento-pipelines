@@ -3,7 +3,7 @@
 
 Primary enrypoint - toolbox.sh from the bin directory.
 
-Common required environment variables:
+Commonly required environment variables:
 | Name        | Description                           | Type     |
 |-------------|---------------------------------------|----------|
 | SCRIPTS_DIR | path to the toolbox.sh root directory | Variable |
@@ -22,7 +22,7 @@ Command list:
 	* toolbox.sh phpunit api
 	* toolbox.sh phpunit integration
 	* toolbox.sh phpunit unit
-* Static analysers / Linter namespace:
+* Static analyzers / Linter namespace:
 	* toolbox.sh lint phpmd
 	* toolbox.sh lint phpstan
 
@@ -50,7 +50,7 @@ Environment variables:
 | Name           | Description                                                  | Type     |
 |----------------|--------------------------------------------------------------|----------|
 | MYSQL_DATABASE | Name of MySQL database                                       | Variable |
-| DB_DUMP_DIR    | Path to the directory where database dump will be placed or already located | Variable |
+| DB_DUMP_DIR    | Path to the directory where the database dump will be placed or already located | Variable |
 
 ### toolbox.sh db dump
 The script creates a database dump (default operation) or restores it (`--restore` option). The mydumper utility is used to work with dumps.
@@ -59,10 +59,10 @@ The script creates a database dump (default operation) or restores it (`--restor
 Environment variables:
 | Name              | Description                                                  | Type                | Require |
 |-------------------|--------------------------------------------------------------|---------------------|---------|
-| CI_PROJECT_DIR    | project build directory                                      | Predifined variable | Yes     |
+| CI_PROJECT_DIR    | project build directory                                      | Predefined variable | Yes     |
 | MAGENTO_DIR       | path to the Magento 2 root directory                         | Variable            | Yes     |
 | MODULE_DEPS       | array of required git repositories with modules              | Variable            | No      |
-| SMOKE_MODULE_PATH | path to git repository with special module for  Smoke MFTF tests | Variable            | No      |
+| SMOKE_MODULE_PATH | path to git repository with a special module for  Smoke MFTF tests | Variable            | No      |
 | COMPOSER_AUTH     | JSON-content of auth.json composer file                      | Variable            | No      |
 
 ### toolbox.sh modules add
@@ -74,7 +74,7 @@ The script can also install a specific module for Smoke MFTF tests if the path t
 Environment variables:
 | Name           | Description                          | Type                |
 |----------------|--------------------------------------|---------------------|
-| CI_PROJECT_DIR | project build directory              | Predifined variable |
+| CI_PROJECT_DIR | project build directory              | Predefined variable |
 | MAGENTO_DIR    | path to the Magento 2 root directory | Variable            |
 
 These scripts require envsubst.
@@ -88,15 +88,15 @@ Wrapper script to run all integration tests for the current project/module.
 ### toolbox.sh phpunit unit
 Wrapper script to run all unit tests for the current project/module.
 
-## Static analysers / Linter namespace
+## Static analyzers / Linter namespace
 Environment variables:
 | Name           | Description                          | Type                |
 |----------------|--------------------------------------|---------------------|
-| CI_PROJECT_DIR | project build directory              | Predifined variable |
+| CI_PROJECT_DIR | project build directory              | Predefined variable |
 | MAGENTO_DIR    | path to the Magento 2 root directory | Variable            |
 
 ### toolbox.sh lint phpmd
-The script launches PHP Mess Detector with built-in Magento 2 rulset.
+The script launches Magento PHP Mess Detector with built-in rulset.
 
 ### toolbox.sh lint phpstan
 The script starts PHPStan with a built-in .neon config file.
