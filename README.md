@@ -1,4 +1,4 @@
-# Continuous integration tools used at Amasty
+# Magento 2 CI CD pipeline tools used at Amasty
 
 Repository content:
 - [Documentation branch](../../tree/docs)
@@ -12,12 +12,12 @@ Repository content:
 ---
 ### About
 This repository contains the tools we use to organize the process of continuous integration within the company.
-For convenience, all tools are divided into blocks, each of which is stored in a separate repository. In GitLab, we use a group to keep all the repositories, but in GitHub, all blocks are stored in individual branches of the current repository.
+For convenience, all tools are divided into blocks stored in separate repositories. In GitLab, we use a group to keep all the repositories, but in GitHub, all blocks are stored in individual branches of the current repository.
 This branch is the main one and contains the documentation on our tools.
 The blocks themselves also have documentation, which is described directly in the code.
 
-All code is ready to use; however, we are not currently distributing the built images to some.
-For full use, you should build images and connect them according to the instructions.
-All of our pipelines are configured to use the registry built into Gitlab.
+The code is ready to use; however, we are not currently distributing the built images to some of the tools.
+For full usage, you should build images and connect them according to the instructions.
+All of our Magento CI CD pipelines are configured to use the registry built into Gitlab.
 
 Please feel free to create issues or contribute.
