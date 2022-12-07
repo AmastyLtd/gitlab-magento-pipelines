@@ -1,4 +1,4 @@
-# Continuous integration tools used at Amasty
+# Magento 2 CI CD pipeline tools used at Amasty
 
 Repository content:
 - [Documentation branch](../../tree/docs)
