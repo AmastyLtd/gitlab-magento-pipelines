@@ -42,4 +42,4 @@ publish:
   variables:
     GIT_STRATEGY: none
   script:
-    - crane cp "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" "${CI_REGISTRY}/git-tools/ci-common-repo/allure:latest"
+    - crane cp "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" "${CI_REGISTRY}/${CI_TARGET_REPO}/allure:latest"
