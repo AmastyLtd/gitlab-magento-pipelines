@@ -7,7 +7,7 @@ ARG CLONE_URL
 ARG VERSION
 
 RUN apk add --no-cache \
-    git=~2.38 curl=~7.86 bash=~5.2 \
+    git=~2.38 curl=~7.87 bash=~5.2 \
     php81=~8.1 php81-phar=~8.1 php81-mbstring=~8.1 php81-openssl=~8.1 php81-tokenizer=~8.1 \
     php81-xmlwriter=~8.1 php81-simplexml=~8.1 php81-dom=~8.1 php81-ctype=~8.1
 

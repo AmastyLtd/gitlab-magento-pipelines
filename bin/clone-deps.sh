@@ -16,7 +16,8 @@ if [[ ! "${MODULE_DEPS}" =~ magento2\/base\.git ]]; then
   MODULE_DEPS+=("magento2/base.git")
 fi
 
-for _repo in "${MODULE_DEPS[@]}"; do
+# shellcheck disable=SC2128
+for _repo in $MODULE_DEPS; do
   _remote="https://${CONF_CUSERNAME}:${CONF_CTOKEN}@git.amasty.com/${_repo}"
   _branch="${REPO_MAIN_BRANCH_NAME:-master}";
 

@@ -53,7 +53,11 @@ if [ -n "${CI_PROJECT_DIR}" ]; then
     )
 
     if [ "$PHPCS_ALL_FILES" == 1 ]; then
-        args+=("$@")
+        if [ -n "$*" ]; then
+            args+=("$@")
+        else
+            args+=("${CI_PROJECT_DIR}")
+        fi
     else
         for dir in "$@"; do
             if [ ! -d "${CI_PROJECT_DIR}/${dir}" ]; then
