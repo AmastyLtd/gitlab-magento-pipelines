@@ -1,5 +1,7 @@
 ---
 .phpunit:unit:
+  variables:
+    JOB_CODE_REGEX: /phpunit:unit/
   artifacts:
     reports:
       junit: unit-report.xml
@@ -8,6 +10,8 @@
     - toolbox.sh phpunit unit
 
 .phpunit:integration:
+  variables:
+    JOB_CODE_REGEX: /phpunit:integration/
   artifacts:
     reports:
       junit: integration-report.xml
@@ -16,6 +20,8 @@
     - toolbox.sh phpunit integration
 
 .phpunit:api:rest:
+  variables:
+    JOB_CODE_REGEX: /phpunit:api:rest/
   artifacts:
     reports:
       junit: api-report.xml
@@ -24,6 +30,8 @@
     - toolbox.sh phpunit api --type rest
 
 .phpunit:api:graphql:
+  variables:
+    JOB_CODE_REGEX: /phpunit:api:graphql/
   artifacts:
     reports:
       junit: api-report.xml

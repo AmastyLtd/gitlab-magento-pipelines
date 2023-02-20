@@ -1,4 +1,6 @@
 ---
 .composer:validate:
+  variables:
+    JOB_CODE_REGEX: /composer:validate/
   script:
     - composer_json.py

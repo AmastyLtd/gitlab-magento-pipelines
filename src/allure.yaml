@@ -1,5 +1,7 @@
 ---
 .allure:report:
+  variables:
+    JOB_CODE_REGEX: /(allure:report|magento:mftf|magento:deploy:dump)/
   artifacts:
     when: always
     paths:

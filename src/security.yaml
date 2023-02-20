@@ -1,0 +1,58 @@
+variables:
+  SECURE_ANALYZERS_PREFIX: "$CI_TEMPLATE_REGISTRY_HOST/security-products"
+  SAST_IMAGE_SUFFIX: ""
+  SECRET_DETECTION_IMAGE_SUFFIX: ""
+
+  SAST_EXCLUDED_ANALYZERS: ""
+  SAST_EXCLUDED_PATHS: "spec, test, tests, tmp"
+
+  SECRET_DETECTION_IMAGE_SUFFIX: ""
+  SECRETS_ANALYZER_VERSION: "4"
+  SECRET_DETECTION_EXCLUDED_PATHS: ""
+
+.sast:analyzer:
+  variables:
+    SEARCH_MAX_DEPTH: 4
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+  script:
+    - /analyzer run
+
+.sast:nodejs-scan:
+  extends: .sast:analyzer
+  image:
+    name: "$SAST_ANALYZER_IMAGE"
+  variables:
+    SAST_ANALYZER_IMAGE_TAG: 3
+    SAST_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/nodejs-scan:$SAST_ANALYZER_IMAGE_TAG"
+    JOB_CODE_REGEX: /sast:nodejs-scan/
+
+.sast:phpcs-security-audit:
+  extends: .sast:analyzer
+  image:
+    name: "$SAST_ANALYZER_IMAGE"
+  variables:
+    SAST_ANALYZER_IMAGE_TAG: 3
+    SAST_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/phpcs-security-audit:$SAST_ANALYZER_IMAGE_TAG"
+    JOB_CODE_REGEX: /sast:phpcs-security-audit/
+
+.sast:semgrep:
+  extends: .sast:analyzer
+  image:
+    name: "$SAST_ANALYZER_IMAGE"
+  variables:
+    SEARCH_MAX_DEPTH: 20
+    SAST_ANALYZER_IMAGE_TAG: 3
+    SAST_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/semgrep:$SAST_ANALYZER_IMAGE_TAG$SAST_IMAGE_SUFFIX"
+    JOB_CODE_REGEX: /sast:semgrep/
+
+.security:secret-analyzer:
+  variables:
+    JOB_CODE_REGEX: /security:secret-analyzer/
+  image: "$SECURE_ANALYZERS_PREFIX/secrets:$SECRETS_ANALYZER_VERSION$SECRET_DETECTION_IMAGE_SUFFIX"
+  artifacts:
+    reports:
+      secret_detection: gl-secret-detection-report.json
+  script:
+    - /analyzer run

@@ -1,5 +1,7 @@
 ---
 .static:phpstan:
+  variables:
+    JOB_CODE_REGEX: /static:phpstan/
   artifacts:
     reports:
       junit: phpstan-report.xml
@@ -8,6 +10,8 @@
     - toolbox.sh static phpstan
 
 .static:phpmd:
+  variables:
+    JOB_CODE_REGEX: /static:phpmd/
   script:
     - toolbox.sh modules add
     - toolbox.sh static phpmd

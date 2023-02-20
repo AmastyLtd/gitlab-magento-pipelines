@@ -18,6 +18,8 @@ include:
   - local: /src/images.yaml
   - local: /src/rules.yaml
   - local: /src/services.yaml
+  - local: /src/security.yaml
+  - local: /src/quality/sonarqube.yaml
 
 stages:
   - merge-master
@@ -59,11 +61,47 @@ stages:
   needs: ["composer.json"]
 ### End.
 
+"SonarQube":
+  stage: quality-check
+  extends:
+    - .tags
+    - .quality:sonarqube
+    - .rule:quality:sonarqube
+
+"Secret Detection":
+  stage: quality-check
+  extends:
+    - .tags
+    - .security:secret-analyzer
+    - .rule:security:secret-analyzer
+
+"SAST: nodejs scan":
+  stage: quality-check
+  extends:
+    - .tags
+    - .sast:nodejs-scan
+    - .rule:sast:nodejs-scan
+
+"SAST: phpcs security audit":
+  stage: quality-check
+  extends:
+    - .tags
+    - .sast:phpcs-security-audit
+    - .rule:sast:phpcs-security-audit
+
+"SAST: semgrep":
+  stage: quality-check
+  extends:
+    - .tags
+    - .sast:semgrep
+    - .rule:sast:semgrep
+
 "PHPCS: Custom rulset":
   stage: quality-check
   extends:
     - .tags
-    - .phpcs:amasty_ruleset
+    - .rule:skip-job
+    - .phpcs:custom_ruleset
     - .image:phpcs
 
 "PHPCS: Magento marketplace rulset":
@@ -129,8 +167,6 @@ stages:
 
 "Magento CE 2.3":
   stage: magento-deploy-test
-  variables:
-    JOB_MAGE_EDITION: community
   services:
     - !reference [.services:mysql, services]
   extends:
@@ -142,8 +178,6 @@ stages:
 
 "Magento EE 2.3":
   stage: magento-deploy-test
-  variables:
-    JOB_MAGE_EDITION: enterprise
   services:
     - !reference [.services:mysql, services]
   extends:
@@ -155,8 +189,6 @@ stages:
 
 "Magento CE 2.4":
   stage: magento-deploy-test
-  variables:
-    JOB_MAGE_EDITION: community
   services:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
@@ -170,8 +202,6 @@ stages:
 
 "Magento EE 2.4":
   stage: magento-deploy-test
-  variables:
-    JOB_MAGE_EDITION: enterprise
   services:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
@@ -185,8 +215,6 @@ stages:
 
 "Magento CE 2.4: upgrade from master branch":
   stage: magento-deploy-test
-  variables:
-    JOB_MAGE_EDITION: community
   services:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
@@ -201,14 +229,12 @@ stages:
 "Magento CE 2.4 (dump)":
   stage: magento-deploy-test
   variables:
-    JOB_MAGE_EDITION: community
     SMOKE_MODULE_PATH: mftf/mftf-scripts/smoke-mftf.git
   services:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
-  tags:
-    - runner3
   extends:
+    - .tags
     - .image:magento-v2-community
     - .rule:magento-smoke-with-edition
     - .services:variables:mysql
@@ -218,14 +244,12 @@ stages:
 "Magento EE 2.4 (dump)":
   stage: magento-deploy-test
   variables:
-    JOB_MAGE_EDITION: enterprise
     SMOKE_MODULE_PATH: mftf/mftf-scripts/smoke-mftf.git
   services:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
-  tags:
-    - runner4
   extends:
+    - .tags
     - .image:magento-v2-enterprise
     - .rule:magento-smoke-with-edition
     - .services:variables:mysql
@@ -244,9 +268,8 @@ stages:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
     - !reference [.services:selenium, services]
-  tags:
-    - runner3
   extends:
+    - .tags
     - .image:web
     - .rule:magento-smoke-with-edition-delayed
     - .services:variables:mysql
@@ -265,9 +288,8 @@ stages:
     - !reference [.services:mariadb, services]
     - !reference [.services:elasticsearch, services]
     - !reference [.services:selenium, services]
-  tags:
-    - runner4
   extends:
+    - .tags
     - .image:web
     - .rule:magento-smoke-with-edition-delayed
     - .services:variables:mysql

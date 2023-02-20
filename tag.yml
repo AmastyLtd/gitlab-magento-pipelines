@@ -1,0 +1,18 @@
+---
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - when: never
+
+include:
+  - local: /src/python/tag.yaml
+  - local: /src/images.yaml
+
+"Create tag":
+  extends:
+    - .tag:create
+    - .image:toolbox.py
+  tags:
+    - docker
+    - ci-magento
+...

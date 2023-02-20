@@ -1,55 +1,72 @@
 ---
+.rule:skip-job:
+  rules:
+    - if: $SKIPPED_JOBS_CODES =~ $JOB_CODE_REGEX
+      when: never
+
 .rule:master:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: $CI_COMMIT_BRANCH == "master"
 
 .rule:magento-with-edition:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: &magento-with-edition >-
         (
           $CI_COMMIT_BRANCH == "master"
           || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
         ) && ($MAGENTO_EDITION == null || $MAGENTO_EDITION == $JOB_MAGE_EDITION)
+         && ($MAGENTO_VERSION == null || $MAGENTO_VERSION == $JOB_MAGE_VERSION)
 
 .rule:magento-with-edition-except-master:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: >-
         $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
         && ($MAGENTO_EDITION == null || $MAGENTO_EDITION == $JOB_MAGE_EDITION)
+        && ($MAGENTO_VERSION == null || $MAGENTO_VERSION == $JOB_MAGE_VERSION)
 
 .rule:magento-with-edition-except-smoke:
   rules:
-    - exists:
+    - !reference [.rule:skip-job, rules]
+    - if: $SKIPPED_JOBS_CODES !~ /(magento:mftf|magento:deploy:dump)/
+      exists:
         - .smoke.json
       when: never
     - if: *magento-with-edition
 
 .rule:default-with-branch:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: &branch-rule >-
         $CI_COMMIT_BRANCH == "master"
         || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
 
 .rule:magento-smoke-with-edition:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: *magento-with-edition
       exists:
         - .smoke.json
 
 .rule:magento-smoke-with-edition-delayed:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: *magento-with-edition
       exists:
         - .smoke.json
       when: delayed
-      start_in: 30 seconds
+      start_in: 10 seconds
 
 .rule:merge-master:
   rules:
-  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - !reference [.rule:skip-job, rules]
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
 
 .rule:unit-test:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: *branch-rule
       exists:
         - Test/Unit/**/*
@@ -58,6 +75,7 @@
 
 .rule:integration-tests:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: *branch-rule
       exists:
         - Test/Integration/**/*
@@ -66,8 +84,72 @@
 
 .rule:api-tests:
   rules:
+    - !reference [.rule:skip-job, rules]
     - if: *branch-rule
       exists:
         - Test/Api/**/*
         - Test/Api/*/*
         - Test/Api/*
+
+.rule:sast:nodejs-scan:
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - if: $SAST_DISABLED
+      when: never
+    - if: $SAST_EXCLUDED_ANALYZERS =~ /nodejs-scan/
+      when: never
+    - if: *branch-rule
+      exists:
+        - '**/package.json'
+
+.rule:sast:phpcs-security-audit:
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - if: $SAST_DISABLED
+      when: never
+    - if: $SAST_EXCLUDED_ANALYZERS =~ /phpcs-security-audit/
+      when: never
+    - if: *branch-rule
+      exists:
+        - '**/*.php'
+
+.rule:sast:semgrep:
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - if: $SAST_DISABLED
+      when: never
+    - if: $SAST_EXCLUDED_ANALYZERS =~ /semgrep/
+      when: never
+    - if: *branch-rule
+      exists:
+        - '**/*.py'
+        - '**/*.js'
+        - '**/*.jsx'
+        - '**/*.ts'
+        - '**/*.tsx'
+        - '**/*.c'
+        - '**/*.go'
+        - '**/*.java'
+        - '**/*.cs'
+        - '**/*.html'
+        - '**/*.scala'
+        - '**/*.sc'
+
+.rule:security:secret-analyzer:
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - if: $SECRET_DETECTION_DISABLED
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH 
+
+.rule:quality:sonarqube:
+  variables:
+    SONAR_SCAN_BRANCH: master
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - if: $SONAR_PROJECT_KEY == null || $SONAR_PROJECT_KEY == ""
+      when: never
+    - if: $CI_COMMIT_BRANCH == $SONAR_SCAN_BRANCH

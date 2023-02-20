@@ -10,10 +10,11 @@
     reports:
       junit: junit.xml
 
-.phpcs:amasty_ruleset:
+.phpcs:custom_ruleset:
   extends: .phpcs:base
   variables:
     PHPCS_BASE_PATH: "${CI_PROJECT_DIR}"
+    JOB_CODE_REGEX: /phpcs:custom_ruleset/
   script:
     - phpcs.sh
 
@@ -26,6 +27,7 @@
     PHPCS_SEVERITY: 10
     PHPCS_FILE_EXTENSIONS: php,phtml
     WORKSPACE: "/tmp/workspace"
+    JOB_CODE_REGEX: /phpcs:marketplace_ruleset/
   script:
     - clone-deps.sh "${WORKSPACE}"
     - phpcs.sh "${WORKSPACE}" "${CI_PROJECT_DIR}"

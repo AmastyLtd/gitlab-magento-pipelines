@@ -1,24 +1,39 @@
----
+variables:
+  LIB_IMAGES_NAME_PREFIX: "$CI_REGISTRY/git-tools/pipeline-library"
+  MAGENTO_V2_IMAGE_TAG: "latest"
+
 .image:phpcs:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/phpcs:latest
+  image: $LIB_IMAGES_NAME_PREFIX/phpcs:latest
 
 .image:toolbox.py:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/python:latest
+  image: $LIB_IMAGES_NAME_PREFIX/python:latest
 
 .image:web:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/web:latest
+  image: $LIB_IMAGES_NAME_PREFIX/web:latest
 
 .image:allure:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/allure:latest
+  image: $LIB_IMAGES_NAME_PREFIX/allure:latest
 
 .image:magento-v2-community:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v2-community:latest
+  image: $LIB_IMAGES_NAME_PREFIX/magento-v2-community:$MAGENTO_V2_IMAGE_TAG
+  variables:
+    JOB_MAGE_EDITION: community
+    JOB_MAGE_VERSION: "2.4"
 
 .image:magento-v2-enterprise:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v2-enterprise:latest
+  image: $LIB_IMAGES_NAME_PREFIX/magento-v2-enterprise:$MAGENTO_V2_IMAGE_TAG
+  variables:
+    JOB_MAGE_EDITION: enterprise
+    JOB_MAGE_VERSION: "2.4"
 
 .image:magento-v1-community:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v1-community:latest
+  image: $LIB_IMAGES_NAME_PREFIX/magento-v1-community:latest
+  variables:
+    JOB_MAGE_EDITION: community
+    JOB_MAGE_VERSION: "2.3"
 
 .image:magento-v1-enterprise:
-  image: git.amasty.com:4567/git-tools/ci-common-repo/magento-v1-enterprise:latest
+  image: $LIB_IMAGES_NAME_PREFIX/magento-v1-enterprise:latest
+  variables:
+    JOB_MAGE_EDITION: enterprise
+    JOB_MAGE_VERSION: "2.3"

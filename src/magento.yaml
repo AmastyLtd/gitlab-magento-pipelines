@@ -7,22 +7,30 @@
     MAGE_ADMIN_PASSWORD: "Adm.in123"
 
 .magento:i18n:
+  variables:
+    JOB_CODE_REGEX: /magento:i18n/
   script:
     - toolbox.sh magento i18n
 
 .magento:deploy:installed:
+  variables:
+    JOB_CODE_REGEX: /magento:deploy:install/
   script:
     - toolbox.sh magento install  
     - toolbox.sh modules add
     - toolbox.sh magento deploy --production
 
 .magento:deploy:install:
+  variables:
+    JOB_CODE_REGEX: /magento:deploy:install/
   script:
     - toolbox.sh modules add
     - toolbox.sh magento install  
     - toolbox.sh magento deploy --production
 
 .magento:deploy:upgrade:
+  variables:
+    JOB_CODE_REGEX: /magento:deploy:upgrade/
   script:
     - toolbox.sh magento install  
     - toolbox.sh modules add --branch master
@@ -32,6 +40,8 @@
     - toolbox.sh magento deploy --force-cleanup
 
 .magento:deploy:dump:
+  variables:
+    JOB_CODE_REGEX: /(magento:mftf|magento:deploy:dump)/
   extends: .magento:variables:mftf
   cache:
     - key: "magento-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
@@ -51,6 +61,8 @@
 
 .magento:mftf:
   extends: .magento:variables:mftf
+  variables:
+    JOB_CODE_REGEX: /(magento:mftf|magento:deploy:dump)/
   cache:
     - key: "magento-dump-$JOB_MAGE_EDITION-$CI_PIPELINE_ID"
       paths:
@@ -68,6 +80,8 @@
         - "$CI_PROJECT_DIR/mftf.log"
         - "$CI_PROJECT_DIR/.success_exit_code"
         - "$MFTF_OUTPUT_DIR"
+        - "$CI_PROJECT_DIR/log"
+        - "$CI_PROJECT_DIR/report"
       expire_in: 6h
   script:
     - toolbox.sh db dump --restore
@@ -75,5 +89,7 @@
     - mv "$MAGENTO_DUMP_DIR/dev/tests/acceptance/tests/_output" "$MFTF_OUTPUT_DIR"
   after_script:
     - cp "$MAGENTO_DUMP_DIR/dev/tests/acceptance/mftf.log" "$CI_PROJECT_DIR/mftf.log" || true
-    - rm -rf "$MAGENTO_DUMP_DIR"
-    - rm -rf "$DB_DUMP_DIR"
+    - cp -r "$MAGENTO_DUMP_DIR/var/log" "$CI_PROJECT_DIR" || true
+    - cp -r "$MAGENTO_DUMP_DIR/var/report" "$CI_PROJECT_DIR" || true
+    - rm -rf "$MAGENTO_DUMP_DIR" && mkdir -p "$MAGENTO_DUMP_DIR"
+    - rm -rf "$DB_DUMP_DIR" && mkdir -p "$DB_DUMP_DIR"
