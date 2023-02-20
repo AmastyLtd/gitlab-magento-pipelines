@@ -1,7 +1,4 @@
 ---
-variables:
-  TARGET_REGISTRY: "${CI_REGISTRY}/git-tools/ci-common-repo"
-
 .common:
   tags:
     - docker-builder
@@ -23,7 +20,8 @@ variables:
     - crane auth login -u ${CI_DEPLOY_USER} -p ${CI_DEPLOY_PASSWORD} ${CI_REGISTRY}
   variables:
     GIT_STRATEGY: none
+    TARGET_IMAGE_TAG: "latest"
   rules:
     - when: manual
   script:
-    - crane cp "${CI_REGISTRY_IMAGE}/${ORGINAL_IMAGE}" "${TARGET_REGISTRY}/${TARGET_PREFIX}${TARGET_IMAGE}:latest"
+    - crane cp "${CI_REGISTRY_IMAGE}/${ORGINAL_IMAGE}" "${CI_REGISTRY}/${CI_TARGET_REPO}/${TARGET_PREFIX}${TARGET_IMAGE}:${TARGET_IMAGE_TAG}"

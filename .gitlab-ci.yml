@@ -43,14 +43,15 @@ magento:2.3.7-p4:
       - local: .gitlab/php.yaml
       - local: .gitlab/magento.yaml
 
-magento:2.4.5-p1:
+magento:2.4.6-beta8:
   stage: build
   variables:
     PHP_VERSION: "8.1"
     PHP_TAG: "8.1"
-    MAGENTO_VERSION: "2.4.5-p1"
+    MAGENTO_VERSION: "2.4.6-beta8"
     TARGET_PREFIX: "magento-v2-"
     IMAGE_OPTIONS: --mydumper
+    TARGET_IMAGE_TAG: "beta"
   rules: *build_rules
   trigger:
     strategy: depend

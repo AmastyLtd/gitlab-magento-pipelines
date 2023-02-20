@@ -3,7 +3,7 @@ FROM alpine:3.16 AS mydumper
 
 RUN apk add --no-cache git build-base \
     cmake glib-dev zlib-dev pcre-dev mariadb-dev
-RUN git clone https://github.com/mydumper/mydumper.git /source && \
+RUN git clone https://github.com/mydumper/mydumper.git --branch v0.13.1-2 --depth 1 /source && \
     cd /source && cmake . -DWITH_SSL=OFF && make
 
 {% endif %}
@@ -27,7 +27,7 @@ RUN apk add --no-cache \
     bash sudo git nano python3 zip procps \
     freetype-dev libjpeg-turbo-dev libpng pcre \
     libxml2-dev libxslt-dev libsodium-dev libzip-dev \
-    icu-dev oniguruma-dev glib-dev mariadb-dev
+    icu-dev oniguruma-dev glib-dev mariadb-dev libwebp-dev
 
 # Install PHP extensions from pecl
 RUN apk add --no-cache --virtual .build-deps g++ gcc make autoconf \
@@ -35,7 +35,7 @@ RUN apk add --no-cache --virtual .build-deps g++ gcc make autoconf \
     && apk del .build-deps
 
 # Configure the gd library
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
     docker-php-ext-install -j4 \
         dom gd intl mbstring pdo_mysql xsl \
         zip soap bcmath sockets opcache
