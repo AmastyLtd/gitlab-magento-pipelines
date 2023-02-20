@@ -26,8 +26,8 @@ def process_directories(directory):
 
 def parse_composer(composerFile) -> List[str]:
     composer_json = json.load(open(composerFile, "r"))
-    requires = composer_json['require']
-    vendor_name = composer_json['name'].split('/')[0]
+    requires = composer_json.get('require', {})
+    vendor_name = composer_json.get('name', '').split('/')[0]
 
     if 'amasty' != vendor_name:
         vendor_name += "|amasty"
@@ -38,9 +38,9 @@ def parse_composer(composerFile) -> List[str]:
     for package,version in requires.items():
         if not regex.match(package):
             if '*' == version:
-                packages +=[package]
+                packages += [package]
             else:
-                packages +=[package+":"+version]
+                packages += [package+":"+version]
 
     return packages
 

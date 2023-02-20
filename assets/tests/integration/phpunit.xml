@@ -50,53 +50,6 @@
         <const name="TESTS_PARALLEL_RUN" value="1"/>
     </php>
     <listeners>
-        <listener class="Yandex\Allure\PhpUnit\AllurePhpUnit">
-            <arguments>
-                <string>var/allure-results</string>
-                <boolean>true</boolean>
-                <array>
-                    <element key="codingStandardsIgnoreStart">
-                        <string>codingStandardsIgnoreStart</string>
-                    </element>
-                    <element key="codingStandardsIgnoreEnd">
-                        <string>codingStandardsIgnoreEnd</string>
-                    </element>
-                    <element key="expectedExceptionMessageRegExp">
-                        <string>expectedExceptionMessageRegExp</string>
-                    </element>
-                    <element key="magentoAdminConfigFixture">
-                        <string>magentoAdminConfigFixture</string>
-                    </element>
-                    <element key="magentoAppArea">
-                        <string>magentoAppArea</string>
-                    </element>
-                    <element key="magentoAppIsolation">
-                        <string>magentoAppIsolation</string>
-                    </element>
-                    <element key="magentoCache">
-                        <string>magentoCache</string>
-                    </element>
-                    <element key="magentoComponentsDir">
-                        <string>magentoComponentsDir</string>
-                    </element>
-                    <element key="magentoConfigFixture">
-                        <string>magentoConfigFixture</string>
-                    </element>
-                    <element key="magentoDataFixture">
-                        <string>magentoDataFixture</string>
-                    </element>
-                    <element key="magentoDataFixtureBeforeTransaction">
-                        <string>magentoDataFixtureBeforeTransaction</string>
-                    </element>
-                    <element key="magentoDbIsolation">
-                        <string>magentoDbIsolation</string>
-                    </element>
-                    <element key="magentoIndexerDimensionMode">
-                        <string>magentoIndexerDimensionMode</string>
-                    </element>
-                </array>
-            </arguments>
-        </listener>
         <listener class="Magento\TestFramework\Event\PhpUnit"/>
         <listener class="Magento\TestFramework\ErrorLog\Listener"/>
     </listeners>

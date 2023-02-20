@@ -63,7 +63,7 @@ custom_output info "Configure .env & .credentials files..."
   echo "MAGENTO_ADMIN_PASSWORD=${MAGE_ADMIN_PASSWORD:-a111111}"
   echo "SELENIUM_CLOSE_ALL_SESSIONS=true"
   echo "SELENIUM_HOST=${SELENIUM_HOST:-selenium}"
-  echo "SELENIUM_PORT=${SELENIUM_PORT:-4444}"
+  echo "SELENIUM_PORT=4444"
   echo "SELENIUM_PROTOCOL=http"
   echo "SELENIUM_PATH=/wd/hub"
   echo "BROWSER=chrome"
@@ -81,7 +81,7 @@ export MAGENTO_DIR PHP_MEMORY_LIMIT="4G"
 sudo --preserve-env=ASSETS_DIR,MAGENTO_DIR sh -c 'envsubst '"'"'${MAGENTO_DIR}'"'"' < "${ASSETS_DIR}/templates/nginx.conf.template" > /etc/nginx/http.d/default.conf'
 sudo --preserve-env=ASSETS_DIR,PHP_MEMORY_LIMIT sh -c 'envsubst < "${ASSETS_DIR}/templates/fpm-pool.conf.template" > /usr/local/etc/php-fpm.d/www.conf'
 
-sudo php-fpm -D -R
+sudo php-fpm -D -R > /dev/null 2>&1
 sudo nginx
 
 if [ "${AMASTY_SMOKE_MODULE_ENABLED}" -eq 1 ]; then

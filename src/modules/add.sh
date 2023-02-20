@@ -89,6 +89,7 @@ done
 load_file src/magento.sh
 load_file src/python.sh
 load_file src/git.sh
+load_file src/composer-repo.sh
 
 install_module() {
     local _target_dir _module_path _module_branch _remote _tmp_path
@@ -116,7 +117,7 @@ install_composer_deps() {
 
     if [ -z "$COMPOSER_AUTH" ]; then
         custom_output warning "COMPOSER_AUTH variable is empty. Composer auth data will not be used."
-        (composer config --unset repositories.\* && custom_output warning "All repositories were removed from Magento2 composer.json") || true
+        (composer config --unset repositories.0 && custom_output warning "All repositories were removed from Magento2 composer.json") || true
     fi
 
     composer_installer
@@ -162,6 +163,11 @@ if [ "$SKIP_CI_MODULE" -eq 0 ]; then
 fi
 
 if [ "$INSTALL_COMPOSER_DEPENDENCIES" -eq 1 ]; then
+    custom_output info "Add composer repositories..."
+    cd "$MAGENTO_DIR"
+    composer_add_domains
+    composer_add_repositories
+    composer_add_packages
     custom_output info "Install composer dependencies..."
     install_composer_deps
 fi

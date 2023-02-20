@@ -40,7 +40,7 @@ if [ ! -d "${WORK_DIR}/i18n/" ]; then
   mkdir -p "${WORK_DIR}/i18n/"
 fi
 
-if ! bin_magento i18n:collect-phrases --output="$CI_PROJECT_DIR/i18n/en_US.csv" "$CI_PROJECT_DIR"; then
+if ! bin_magento i18n:collect-phrases --output="${WORK_DIR}/i18n/en_US.csv" "$CI_PROJECT_DIR"; then
   custom_output info "No phrases found or error has been occured. Skipping..."
   exit 0
 fi;

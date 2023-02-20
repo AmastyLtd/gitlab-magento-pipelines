@@ -1,9 +1,12 @@
 upstream fastcgi_backend {
     server  127.0.0.1:9000;
+    keepalive 100;
 }
 
 server {
     listen 80 default_server;
+    server_name _;
+
     set $MAGE_ROOT ${MAGENTO_DIR};
     set $MAGE_DEBUG_SHOW_ARGS 0;
 
