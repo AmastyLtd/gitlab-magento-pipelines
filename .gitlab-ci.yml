@@ -1,6 +1,4 @@
-variables:
-  LATEST_REPO_REGISTRY: "${CI_REGISTRY}/git-tools/ci-common-repo"
-
+---
 stages:
   - lint
   - build
@@ -15,10 +13,10 @@ pylint:
   stage: lint
   image: python:alpine
   before_script:
-    - pip install -r src/requirements.txt
+    - pip install -r requirements.txt
     - pip install pylint
   script:
-    - pylint src/**.py
+    - pylint bin/**.py
 
 dockerfile:
   extends: .common
@@ -62,4 +60,4 @@ publish:
   variables:
     GIT_STRATEGY: none
   script:
-    - crane cp "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" "${LATEST_REPO_REGISTRY}/python:latest"
+    - crane cp "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" "${CI_REGISTRY}/${CI_TARGET_REPO}/python:latest"

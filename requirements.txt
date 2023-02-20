@@ -2,3 +2,4 @@ gitlab==1.0.2
 GitPython==3.1.29
 python_gitlab==3.3.0
 semantic_version==2.8.5
+jsonschema==4.4.0

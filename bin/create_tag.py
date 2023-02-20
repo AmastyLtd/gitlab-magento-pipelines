@@ -8,12 +8,14 @@ import git
 
 __debug = False
 
+
 def exception_handler(kind, message, traceback):
     """Function that overrides default exception output according to verbose option."""
     if __debug:
         sys.__excepthook__(kind, message, traceback)
     else:
         print(f"{kind.__name__}: {message}", file=sys.stderr)
+
 
 sys.excepthook = exception_handler
 
@@ -29,24 +31,24 @@ repo = git.Repo(args.path)
 origin = repo.remotes.origin
 origin.fetch()
 
-if os.path.isfile(args.path+'/composer.json'):
-    with open(args.path+'/composer.json', mode="r", encoding="utf-8") as json_file:
+if os.path.isfile(args.path + '/composer.json'):
+    with open(args.path + '/composer.json', mode="r", encoding="utf-8") as json_file:
         current_version = json.load(json_file)['version']
-elif os.path.isfile(args.path+'/package.json'):
-    with open(args.path+'/package.json', mode="r", encoding="utf-8") as json_file:
+elif os.path.isfile(args.path + '/package.json'):
+    with open(args.path + '/package.json', mode="r", encoding="utf-8") as json_file:
         current_version = json.load(json_file)['version']
 else:
-    raise Exception('Cannot find supported source for tag creation.')
+    raise RuntimeError('Cannot find supported source for tag creation.')
 
 if repo.active_branch.name != 'master':
-    raise Exception('Current branch is not master, cannot continue')
+    raise RuntimeError('Current branch is not master, cannot continue')
 if repo.is_dirty() is True:
-    raise Exception('Repo is dirty, cannot continue')
+    raise RuntimeError('Repo is dirty, cannot continue')
 
 if current_version in repo.tags and repo.tags[current_version].commit.hexsha != repo.head.commit.hexsha:
     tag = repo.tags[current_version]
     repo.create_tag(
-        current_version+'-'+repo.git.rev_parse(tag.commit.hexsha, short=4),
+        current_version + '-' + repo.git.rev_parse(tag.commit.hexsha, short=4),
         ref=tag.commit.hexsha,
         message=f"Release of {current_version}, build {tag.commit.hexsha}"
     )
@@ -54,6 +56,8 @@ if current_version in repo.tags and repo.tags[current_version].commit.hexsha != 
     origin.push(current_version, delete=True)
     repo.create_tag(current_version, message=f"Release of {current_version}")
     origin.push(tags=True)
-else:
+elif current_version not in repo.tags:
     repo.create_tag(current_version, message=f"Release of {current_version}")
     origin.push(tags=True)
+else:
+    print(f"Tag {current_version} already exists and is up to date.")

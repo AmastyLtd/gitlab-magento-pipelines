@@ -6,4 +6,4 @@ good-names=__debug
 function-naming-style=snake_case
 
 [MESSAGES CONTROL]
-disable=missing-module-docstring,broad-except
+disable=missing-module-docstring
