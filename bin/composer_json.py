@@ -140,7 +140,7 @@ if __name__ == "__main__":
                 )
                 ERROR_COUNT += 1
             else:
-                license_field_value = license_field.pop()
+                license_field_value = license_field[0]
 
                 if license_field_value not in ALLOWED_LICENSES:
                     print_validation_error(
