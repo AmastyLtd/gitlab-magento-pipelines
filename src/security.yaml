@@ -10,6 +10,7 @@ variables:
   SECRETS_ANALYZER_VERSION: "4"
   SECRET_DETECTION_EXCLUDED_PATHS: ""
 
+
 .sast:analyzer:
   variables:
     SEARCH_MAX_DEPTH: 4

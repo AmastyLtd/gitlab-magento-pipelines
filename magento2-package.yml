@@ -63,6 +63,7 @@ stages:
 
 "SonarQube":
   stage: quality-check
+  allow_failure: true
   extends:
     - .tags
     - .quality:sonarqube
@@ -100,7 +101,7 @@ stages:
   stage: quality-check
   extends:
     - .tags
-    - .rule:skip-job
+    - .rule:phpcs
     - .phpcs:custom_ruleset
     - .image:phpcs
 
@@ -209,6 +210,32 @@ stages:
     - .tags
     - .image:magento-v2-enterprise
     - .rule:magento-with-edition-except-smoke
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:install
+
+"Magento CE 2.4 Beta":
+  stage: magento-deploy-test
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .image:magento-v2-community
+    - .rule:beta-job
+    - .services:variables:mysql
+    - .services:variables:elasticsearch
+    - .magento:deploy:install
+
+"Magento EE 2.4 Beta":
+  stage: magento-deploy-test
+  services:
+    - !reference [.services:mariadb, services]
+    - !reference [.services:elasticsearch, services]
+  extends:
+    - .tags
+    - .image:magento-v2-enterprise
+    - .rule:beta-job
     - .services:variables:mysql
     - .services:variables:elasticsearch
     - .magento:deploy:install

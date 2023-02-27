@@ -9,6 +9,11 @@
     - !reference [.rule:skip-job, rules]
     - if: $CI_COMMIT_BRANCH == "master"
 
+.rule:phpcs:
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - when: on_success
+
 .rule:magento-with-edition:
   rules:
     - !reference [.rule:skip-job, rules]
@@ -58,6 +63,18 @@
         - .smoke.json
       when: delayed
       start_in: 10 seconds
+
+.rule:beta-job:
+  rules:
+    - !reference [.rule:skip-job, rules]
+    - if: >-
+        ( $CI_COMMIT_BRANCH == "master"
+          || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(master|dev|staging|release.*|hotfix.*|feature.*)$/
+        ) && ($MAGENTO_EDITION == null || $MAGENTO_EDITION == $JOB_MAGE_EDITION)
+        && ($MAGENTO_VERSION == null || $MAGENTO_VERSION == $JOB_MAGE_VERSION)
+        && $JOB_MAGE_VERSION == "2.4" && $MAGENTO_BETA != null
+      variables:
+        MAGENTO_V2_IMAGE_TAG: "beta"
 
 .rule:merge-master:
   rules:
