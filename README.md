@@ -21,3 +21,22 @@ For full usage, you should build images and connect them according to the instru
 All of our Magento CI CD pipelines are configured to use the registry built into Gitlab.
 
 Please feel free to create issues or contribute.
+
+<h2>Other Amasty extensions</h2>
+-> <a href="https://amasty.com/duplicate-categories-for-magento-2.html" target="_blank">Duplicate Categories for Magento 2</a><br>
+-> <a href="https://amasty.com/dropshipping-for-magento-2.html" target="_blank">Dropshipping for Magento 2</a><br>
+-> <a href="https://amasty.com/delivery-date-manager-for-magento-2.html" target="_blank">Delivery Date Manager for Magento 2</a><br>
+-> <a href="https://amasty.com/customer-segmentation-for-magento-2.html" target="_blank">Customer Segmentation for Magento 2</a><br>
+-> <a href="https://amasty.com/customer-group-catalog-for-magento-2.html" target="_blank">Customer Group Catalog for Magento 2</a><br>
+-> <a href="https://amasty.com/customer-group-auto-assign-for-magento-2.html" target="_blank">Customer Group Auto Assign for Magento 2</a><br>
+-> <a href="https://amasty.com/customer-attributes-for-magento-2.html" target="_blank">Customer Attributes for Magento 2</a><br>
+-> <a href="https://amasty.com/custom-stock-status-for-magento-2.html" target="_blank">Custom Stock Status for Magento 2</a><br>
+-> <a href="https://amasty.com/custom-reports-for-magento-2.html" target="_blank">Custom Reports Builder for Magento 2</a><br>
+-> <a href="https://amasty.com/custom-product-option-templates-for-magento-2.html" target="_blank">Product Option Templates for Magento 2</a><br>
+-> <a href="https://amasty.com/custom-order-number-for-magento-2.html" target="_blank">Custom Order Number for Magento 2</a><br>
+-> <a href="https://amasty.com/custom-options-conditions-for-magento-2.html" target="_blank">Custom Promo Conditions for Magento 2</a><br>
+-> <a href="https://amasty.com/custom-form-for-magento-2.html" target="_blank">Custom Form for Magento 2</a><br>
+-> <a href="https://amasty.com/cross-linking-for-magento-2.html" target="_blank">Cross Linking for Magento 2</a><br>
+-> <a href="https://amasty.com/ajax-shopping-cart.html" target="_blank">AJAX Shopping Cart</a><br>
+-> <a href="https://amasty.com/admin-actions-log.html" target="_blank">Admin Actions Log</a><br>
+
